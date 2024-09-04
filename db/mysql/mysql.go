@@ -53,7 +53,11 @@ func InitMysql(config config.DbConfig) (*gorm.DB, error) {
 }
 
 func Migrator(db *gorm.DB) error {
-	if err := db.Migrator().AutoMigrate(&model.User{}); err != nil {
+	if err := db.Migrator().
+		AutoMigrate(
+			&model.User{},
+			&model.Friends{},
+			&model.Point{}); err != nil {
 		return err
 	}
 	return nil

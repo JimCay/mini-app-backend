@@ -39,7 +39,7 @@ func NewHttpServer(serviceManager *service.ServiceManager, config *config.Config
 	apiRouter.Use(authMiddleware)
 
 	apiRouter.HandleFunc("/user/login", util.ResponseWrapper(
-		service.LoginHandler(serviceManager.User))).Methods("GET")
+		service.LoginHandler(serviceManager.User))).Methods("POST")
 
 	server := &http.Server{
 		Addr:              ":" + config.TgConf.Port,

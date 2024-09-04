@@ -1,4 +1,4 @@
-FROM  golang:1.21-stretch AS builder
+FROM  golang:1.21 AS builder
 ADD . /src
 WORKDIR /src
 RUN go mod download
