@@ -110,3 +110,27 @@ func getHmac256Signature(secretKey []byte, data []byte) []byte {
 	sum := mac.Sum(nil)
 	return sum
 }
+
+func EnableCORS(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		// Allow requests from any origin
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+
+		// Allow specified HTTP methods
+
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+
+		// Allow specified headers
+
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept")
+
+		// Continue with the next handler
+
+		next.ServeHTTP(w, r)
+
+	})
+
+}

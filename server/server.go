@@ -33,6 +33,7 @@ func NewServer(storage *db.Storage, config *config.Config) *Server {
 func NewHttpServer(serviceManager *service.ServiceManager, config *config.Config) *http.Server {
 
 	r := mux.NewRouter()
+	r.Use(middleware.EnableCORS)
 	r.HandleFunc("/health", util.ResponseWrapper(service.HealthCheck())).Methods("GET")
 	apiRouter := r.PathPrefix("/api").Subrouter()
 	authMiddleware := middleware.NewTelegramAuthMiddleware(config.TgConf.TelegramBotToken)
