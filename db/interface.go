@@ -10,7 +10,7 @@ type UserStorage interface {
 
 	GetUser(ctx context.Context, id uint64) (*model.User, error)
 
-	GetFriends(ctx context.Context, id uint64) ([]model.Friends, error)
+	GetFriends(ctx context.Context, id uint64) ([]model.Friend, error)
 }
 
 type PointStorage interface {

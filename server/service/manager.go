@@ -7,7 +7,7 @@ import (
 
 type ServiceManager struct {
 	User  *UserService
-	point *PointService
+	Point *PointService
 }
 
 func NewServiceManager(storage *db.Storage, config *config.Config) *ServiceManager {

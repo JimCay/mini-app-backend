@@ -56,7 +56,7 @@ func Migrator(db *gorm.DB) error {
 	if err := db.Migrator().
 		AutoMigrate(
 			&model.User{},
-			&model.Friends{},
+			&model.Friend{},
 			&model.Point{}); err != nil {
 		return err
 	}

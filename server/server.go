@@ -41,6 +41,18 @@ func NewHttpServer(serviceManager *service.ServiceManager, config *config.Config
 	apiRouter.HandleFunc("/user/login", util.ResponseWrapper(
 		service.LoginHandler(serviceManager.User))).Methods("POST")
 
+	apiRouter.HandleFunc("/user/invite", util.ResponseWrapper(
+		service.InviteHandler(serviceManager.User))).Methods("GET")
+
+	apiRouter.HandleFunc("/user/friends", util.ResponseWrapper(
+		service.FriendHandler(serviceManager.User))).Methods("GET")
+
+	apiRouter.HandleFunc("/point/query", util.ResponseWrapper(
+		service.GetPointHandler(serviceManager.Point))).Methods("GET")
+
+	apiRouter.HandleFunc("/point/update", util.ResponseWrapper(
+		service.UpdatePointHandler(serviceManager.Point))).Methods("POST")
+
 	server := &http.Server{
 		Addr:              ":" + config.TgConf.Port,
 		Handler:           r,
@@ -58,7 +70,7 @@ func (s *Server) Start() {
 				fmt.Println("Recovered. Error:\n", r)
 			}
 		}()
-		if err := s.httpServer.ListenAndServeTLS("./cert.pem", "key.pem"); err != nil {
+		if err := s.httpServer.ListenAndServe(); err != nil {
 			log.Error("httpServer error ", err)
 		}
 	}()

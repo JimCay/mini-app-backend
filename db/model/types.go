@@ -12,7 +12,7 @@ type User struct {
 	CreatedAt time.Time
 }
 
-type Friends struct {
+type Friend struct {
 	Id        uint64 `gorm:"primary_key" `
 	Invitor   uint64 `gorm:"index:idx_invitor"`
 	Invitee   uint64

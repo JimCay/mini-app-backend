@@ -27,7 +27,7 @@ func (s *Storage) InsertUser(ctx context.Context, user *model.User, inviteId uin
 			UpdatedAt: time.Now(),
 		}
 		if inviteId != 0 {
-			friend := &model.Friends{
+			friend := &model.Friend{
 				Invitor:   inviteId,
 				Invitee:   user.Id,
 				Value:     config.INVITOR_POINT,
@@ -67,8 +67,8 @@ func (s *Storage) GetUser(ctx context.Context, id uint64) (*model.User, error) {
 	return user, nil
 }
 
-func (s *Storage) GetFriends(ctx context.Context, id uint64) ([]model.Friends, error) {
-	var friends []model.Friends
+func (s *Storage) GetFriends(ctx context.Context, id uint64) ([]model.Friend, error) {
+	var friends []model.Friend
 	err := s.db.Where("invitor", id).Find(&friends).Error
 	if err != nil && err.Error() != RECORD_NOT_FOUND {
 		return nil, err
