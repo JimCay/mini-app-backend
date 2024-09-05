@@ -18,5 +18,5 @@ func (s *Storage) GetPoint(ctx context.Context, id uint64) (*model.Point, error)
 }
 
 func (s *Storage) UpdatePoint(ctx context.Context, point *model.Point) error {
-	return s.db.Model(&model.Point{}).Updates(point).Error
+	return s.db.Model(point).Updates(*point).Error
 }
