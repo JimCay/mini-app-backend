@@ -19,6 +19,7 @@ import (
 type Server struct {
 	httpServer *http.Server
 	tgBot      *bot.TelegramBot
+	conf       *config.Config
 }
 
 func NewServer(storage *db.Storage, config *config.Config) *Server {
@@ -28,6 +29,7 @@ func NewServer(storage *db.Storage, config *config.Config) *Server {
 	return &Server{
 		httpServer: httpServ,
 		tgBot:      myBot,
+		conf:       config,
 	}
 }
 
@@ -54,16 +56,20 @@ func NewHttpServer(serviceManager *service.ServiceManager, config *config.Config
 	apiRouter.HandleFunc("/point/update", util.ResponseWrapper(
 		service.UpdatePointHandler(serviceManager.Point))).Methods("POST")
 
-	originsOk := handlers.AllowedOrigins([]string{"*"})
-	headers := handlers.AllowedHeaders([]string{"Origin", "Content-Type", "Authorization"})
-	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT"})
 	server := &http.Server{
 		Addr:              ":" + config.TgConf.Port,
-		Handler:           handlers.CORS(originsOk, headers, methods)(r),
+		Handler:           handlerCors(r),
 		ReadHeaderTimeout: time.Second * 10,
 		WriteTimeout:      time.Second * 30,
 	}
 	return server
+}
+
+func handlerCors(h http.Handler) http.Handler {
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	headers := handlers.AllowedHeaders([]string{"Origin", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT"})
+	return handlers.CORS(originsOk, headers, methods)(h)
 }
 
 func (s *Server) Start() {
@@ -74,7 +80,7 @@ func (s *Server) Start() {
 				fmt.Println("Recovered. Error:\n", r)
 			}
 		}()
-		if err := s.httpServer.ListenAndServe(); err != nil {
+		if err := s.httpServer.ListenAndServeTLS("./cert.pem", "key.pem"); err != nil {
 			log.Error("httpServer error ", err)
 		}
 	}()
