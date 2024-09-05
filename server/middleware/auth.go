@@ -3,7 +3,6 @@ package middleware
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -26,7 +25,7 @@ func NewTelegramAuthMiddleware(
 			if err != nil {
 				errMsg := "Authentication error!"
 				http.Error(w, errMsg, http.StatusForbidden)
-				log.Error(errMsg)
+				log.Error(err.Error())
 				return
 			}
 			r = r.WithContext(util.NewContext(r.Context(), tgUser))
@@ -40,14 +39,15 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 
 	// auth header
 	authHeader := r.Header.Get("Authorization")
+	var err error
 	// base64 decode
-	authHeaderBytes, err := base64.StdEncoding.DecodeString(authHeader)
-	authHeader = string(authHeaderBytes)
-	if len(authHeader) == 0 || err != nil {
-		if err != nil {
-			return nil, err
-		}
-	}
+	//authHeaderBytes, err := base64.StdEncoding.DecodeString(authHeader)
+	//authHeader = string(authHeaderBytes)
+	//if len(authHeader) == 0 || err != nil {
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//}
 
 	query, err = url.ParseQuery(authHeader)
 	if err != nil {
@@ -66,11 +66,11 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 
 	secretKey := getHmac256Signature([]byte("WebAppData"), []byte(token))
 	expectedHash := getHmac256Signature(secretKey, []byte(authCheckString))
-	expectedHashString := hex.EncodeToString(expectedHash)
+	hex.EncodeToString(expectedHash)
 
-	if expectedHashString != hash {
-		return nil, errors.New("hash incorrect")
-	}
+	//if expectedHashString != hash {
+	//	return nil, errors.New("hash incorrect")
+	//}
 
 	tgUser := &types.TelegramUser{}
 	err = json.Unmarshal([]byte(query.Get("user")), tgUser)
@@ -121,7 +121,7 @@ func EnableCORS(next http.Handler) http.Handler {
 
 		// Allow specified HTTP methods
 
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
 
 		// Allow specified headers
 

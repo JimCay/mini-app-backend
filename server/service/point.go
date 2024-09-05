@@ -42,6 +42,7 @@ func GetPointHandler(pointService *PointService) util.HttpHandler {
 				Id: uint64(tgUser.ID),
 			})
 		}
+		point.Id = uint64(tgUser.ID)
 		return util.Success(types.GetPoint(point))
 	}
 }
