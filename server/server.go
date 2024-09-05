@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"net/http"
 	"tg-backend/bot"
@@ -33,7 +34,6 @@ func NewServer(storage *db.Storage, config *config.Config) *Server {
 func NewHttpServer(serviceManager *service.ServiceManager, config *config.Config) *http.Server {
 
 	r := mux.NewRouter()
-	r.Use(middleware.EnableCORS)
 	r.HandleFunc("/health", util.ResponseWrapper(service.HealthCheck())).Methods("GET")
 	apiRouter := r.PathPrefix("/api").Subrouter()
 	authMiddleware := middleware.NewTelegramAuthMiddleware(config.TgConf.TelegramBotToken)
@@ -54,9 +54,12 @@ func NewHttpServer(serviceManager *service.ServiceManager, config *config.Config
 	apiRouter.HandleFunc("/point/update", util.ResponseWrapper(
 		service.UpdatePointHandler(serviceManager.Point))).Methods("POST")
 
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	headers := handlers.AllowedHeaders([]string{"Origin", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT"})
 	server := &http.Server{
 		Addr:              ":" + config.TgConf.Port,
-		Handler:           r,
+		Handler:           handlers.CORS(originsOk, headers, methods)(r),
 		ReadHeaderTimeout: time.Second * 10,
 		WriteTimeout:      time.Second * 30,
 	}
