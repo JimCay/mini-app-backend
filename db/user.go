@@ -61,7 +61,10 @@ func (s *Storage) InsertUser(ctx context.Context, user *model.User, inviteId uin
 func (s *Storage) GetUser(ctx context.Context, id uint64) (*model.User, error) {
 	user := &model.User{}
 	err := s.db.Where("id = ?", id).First(user).Error
-	if err != nil && err.Error() != RECORD_NOT_FOUND {
+	if err != nil {
+		if err.Error() == RECORD_NOT_FOUND {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return user, nil
