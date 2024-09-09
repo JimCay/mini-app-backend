@@ -6,10 +6,10 @@ import (
 )
 
 type TelegramUser struct {
-	ID              int    `json:"id"`
+	ID              uint64 `json:"id"`
 	FirstName       string `json:"first_name"`
 	LastName        string `json:"last_name"`
-	Username        string `json:"username"`
+	UserName        string `json:"username"`
 	LanguageCode    string `json:"language_code"`
 	IsPremium       bool   `json:"is_premium"`
 	AllowsWriteToPm bool   `json:"allows_write_to_pm"`
@@ -17,10 +17,20 @@ type TelegramUser struct {
 
 func (tu *TelegramUser) GetUser() *model.User {
 	return &model.User{
-		Id:        uint64(tu.ID),
+		Id:        tu.ID,
 		FirstName: tu.FirstName,
 		LastName:  tu.LastName,
-		Username:  tu.Username,
+		UserName:  tu.UserName,
 		CreatedAt: time.Now(),
+	}
+}
+
+func (tu *TelegramUser) UserPoint(value uint64, pos int32) UserPoint {
+	return UserPoint{
+		Id:       tu.ID,
+		Value:    value,
+		Pos:      pos,
+		Name:     tu.FirstName + " " + tu.LastName,
+		UserName: tu.UserName,
 	}
 }

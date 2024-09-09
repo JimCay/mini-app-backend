@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
+	"io"
 	"net/http"
 	"tg-backend/bot"
 	"tg-backend/config"
 	"tg-backend/db"
+	_ "tg-backend/docs"
 	"tg-backend/pkg/log"
 	"tg-backend/server/middleware"
 	"tg-backend/server/service"
@@ -22,9 +25,9 @@ type Server struct {
 	conf       *config.Config
 }
 
-func NewServer(storage *db.Storage, config *config.Config) *Server {
+func NewServer(storage db.Storage, config *config.Config, writer io.Writer) *Server {
 	serviceManager := service.NewServiceManager(storage, config)
-	httpServ := NewHttpServer(serviceManager, config)
+	httpServ := NewHttpServer(serviceManager, config, writer)
 	myBot := bot.NewTelegramBot(config.TgConf)
 	return &Server{
 		httpServer: httpServ,
@@ -33,36 +36,45 @@ func NewServer(storage *db.Storage, config *config.Config) *Server {
 	}
 }
 
-func NewHttpServer(serviceManager *service.ServiceManager, config *config.Config) *http.Server {
-
+// NewHttpServer
+// @title tg backend API
+// @version 1.0
+// @description tg backend API Document
+// @BasePath /
+func NewHttpServer(sm *service.ServiceManager, config *config.Config, writer io.Writer) *http.Server {
 	r := mux.NewRouter()
+	if config.TgConf.Swagger {
+		r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
+	}
 	r.HandleFunc("/health", util.ResponseWrapper(service.HealthCheck())).Methods("GET")
 	apiRouter := r.PathPrefix("/api").Subrouter()
 	authMiddleware := middleware.NewTelegramAuthMiddleware(config.TgConf.TelegramBotToken)
 	apiRouter.Use(authMiddleware)
 
-	apiRouter.HandleFunc("/user/login", util.ResponseWrapper(
-		service.LoginHandler(serviceManager.User))).Methods("POST")
+	handlerRouter(apiRouter, "/user/login", "POST", service.LoginHandler(sm.User, sm.Point))
+	handlerRouter(apiRouter, "/user/invite", "GET", service.InviteHandler(sm.User))
+	handlerRouter(apiRouter, "/user/friends", "GET", service.FriendHandler(sm.User))
 
-	apiRouter.HandleFunc("/user/invite", util.ResponseWrapper(
-		service.InviteHandler(serviceManager.User))).Methods("GET")
+	handlerRouter(apiRouter, "/point/query", "GET", service.GetPointHandler(sm.Point))
+	handlerRouter(apiRouter, "/point/update", "POST", service.UpdatePointHandler(sm.Point))
+	handlerRouter(apiRouter, "/point/rank", "GET", service.GetRankHandler(sm.Point))
 
-	apiRouter.HandleFunc("/user/friends", util.ResponseWrapper(
-		service.FriendHandler(serviceManager.User))).Methods("GET")
+	handlerRouter(apiRouter, "/task/get", "GET", service.GetTasksHandler(sm.Task))
+	handlerRouter(apiRouter, "/task/check", "POST", service.TaskCheckHandler(sm.Task))
 
-	apiRouter.HandleFunc("/point/query", util.ResponseWrapper(
-		service.GetPointHandler(serviceManager.Point))).Methods("GET")
-
-	apiRouter.HandleFunc("/point/update", util.ResponseWrapper(
-		service.UpdatePointHandler(serviceManager.Point))).Methods("POST")
+	handler := handlers.CombinedLoggingHandler(writer, r)
 
 	server := &http.Server{
 		Addr:              ":" + config.TgConf.Port,
-		Handler:           handlerCors(r),
+		Handler:           handlerCors(handler),
 		ReadHeaderTimeout: time.Second * 10,
 		WriteTimeout:      time.Second * 30,
 	}
 	return server
+}
+
+func handlerRouter(router *mux.Router, path, method string, handler util.HttpHandler) {
+	router.HandleFunc(path, util.ResponseWrapper(handler)).Methods(method)
 }
 
 func handlerCors(h http.Handler) http.Handler {
@@ -73,16 +85,25 @@ func handlerCors(h http.Handler) http.Handler {
 }
 
 func (s *Server) Start() {
-	log.Info("start http server")
+
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
 				fmt.Println("Recovered. Error:\n", r)
 			}
 		}()
-		if err := s.httpServer.ListenAndServeTLS("./cert.pem", "key.pem"); err != nil {
-			log.Error("httpServer error ", err)
+		if s.conf.TgConf.Ssl {
+			log.Info("start https server")
+			if err := s.httpServer.ListenAndServeTLS("./cert.pem", "key.pem"); err != nil {
+				log.Error("httpServer error ", err)
+			}
+		} else {
+			log.Info("start http server")
+			if err := s.httpServer.ListenAndServe(); err != nil {
+				log.Error("httpServer error ", err)
+			}
 		}
+
 	}()
 	log.Info("start tg bot")
 	go func() {

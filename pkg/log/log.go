@@ -46,7 +46,7 @@ const (
 	TraceLevel
 )
 
-func Setup(conf config.LogConfig) error {
+func Setup(conf config.LogConfig) (io.Writer, error) {
 
 	logPath := conf.Path
 	if logPath == "" {
@@ -54,7 +54,7 @@ func Setup(conf config.LogConfig) error {
 	}
 	err := os.MkdirAll(logPath, os.ModePerm)
 	if err != nil {
-		return errors.New("mkdir failed")
+		return nil, errors.New("mkdir failed")
 	}
 
 	now := time.Now()
@@ -70,7 +70,7 @@ func Setup(conf config.LogConfig) error {
 	opts = append(opts, logrotate.RotateSize(conf.Size))
 	logger, err := logrotate.NewLogger(opts...)
 	if err != nil {
-		return errors.New("new logger is error")
+		return nil, errors.New("new logger is error")
 	}
 	level := conf.Level
 	logrus.SetLevel(logrus.Level(level))
@@ -83,7 +83,7 @@ func Setup(conf config.LogConfig) error {
 	logrus.SetOutput(fileAndStdoutWriter)
 	logrus.SetFormatter(new(LogFormatter))
 	logger.Close()
-	return nil
+	return fileAndStdoutWriter, nil
 }
 
 type LogFormatter struct{}

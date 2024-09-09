@@ -14,10 +14,12 @@ type Config struct {
 }
 
 type TgConfig struct {
-	Test               bool
 	TelegramBotToken   string
 	TelegramMiniAppUrl string
+	Test               bool
+	Ssl                bool
 	Port               string
+	Swagger            bool
 }
 
 type LogConfig struct {

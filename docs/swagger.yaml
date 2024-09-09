@@ -1,0 +1,239 @@
+basePath: /
+definitions:
+  types.Friend:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      reward:
+        type: integer
+      userName:
+        type: string
+    type: object
+  types.Point:
+    properties:
+      energy:
+        type: integer
+      id:
+        type: integer
+      limit:
+        type: integer
+      rate:
+        type: integer
+      value:
+        type: integer
+    type: object
+  types.Rank:
+    properties:
+      ranks:
+        items:
+          $ref: '#/definitions/types.UserPoint'
+        type: array
+      self:
+        $ref: '#/definitions/types.UserPoint'
+    type: object
+  types.Task:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      reward:
+        type: integer
+      status:
+        type: boolean
+    type: object
+  types.TaskCheck:
+    properties:
+      id:
+        type: integer
+      status:
+        type: boolean
+    type: object
+  types.UserPoint:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      pos:
+        type: integer
+      userName:
+        type: string
+      value:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: tg backend API Document
+  title: tg backend API
+  version: "1.0"
+paths:
+  /api/point/query:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Point'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 获取积分信息
+      tags:
+      - 积分
+  /api/point/rank:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Rank'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 获取积分排名
+      tags:
+      - 积分
+  /api/point/update:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 积分信息
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/types.Point'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 获取积分排名
+      tags:
+      - 积分
+  /api/task/check:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 任务ID
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/types.TaskCheck'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: true/false
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 检查任务是否完成
+      tags:
+      - 任务
+  /api/task/get:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Task'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 获取任务信息
+      tags:
+      - 任务
+  /api/user/friends:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Friend'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 获取邀请的好友
+      tags:
+      - 用户
+  /api/user/invite:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 获取邀请码
+      tags:
+      - 用户
+  /api/user/login:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Point'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: 登录
+      tags:
+      - 用户
+swagger: "2.0"

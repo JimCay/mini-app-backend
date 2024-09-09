@@ -34,18 +34,26 @@ func (u *UserService) Login(ctx context.Context, tgUser *types.TelegramUser, inf
 }
 
 func (u *UserService) Friends(ctx context.Context, tgUser *types.TelegramUser) ([]types.Friend, error) {
-	friends, err := u.storage.GetFriends(ctx, uint64(tgUser.ID))
+	myInvitee, err := u.storage.GetFriends(ctx, uint64(tgUser.ID))
 	if err != nil {
 		return nil, err
 	}
-	res := make([]types.Friend, 0, len(friends))
-	for _, friend := range friends {
-		res = append(res, types.GetFriend(friend))
+	res := make([]types.Friend, 0, len(myInvitee))
+	for _, mi := range myInvitee {
+		res = append(res, types.GetFriend(&mi))
 	}
 	return res, nil
 }
 
-func LoginHandler(service *UserService) util.HttpHandler {
+// LoginHandler
+// @Tags 用户
+// @Summary 登录
+// @Accept json
+// @Produce json
+// @Failure 500 {string} string
+// @Success 200 {object} types.Point
+// @Router /api/user/login [post]
+func LoginHandler(service *UserService, pointService *PointService) util.HttpHandler {
 	return func(r *http.Request) util.HandleResult {
 		tgUser, _ := util.FromContext(r.Context())
 
@@ -57,10 +65,22 @@ func LoginHandler(service *UserService) util.HttpHandler {
 		if err != nil {
 			return util.ErrorWith("Error login", util.ErrorInternal, err)
 		}
-		return util.HandleResult{}
+		point, err := pointService.GetPoint(r.Context(), tgUser)
+		if err != nil {
+			return util.ErrorWith("Error Get Point", util.ErrorInternal, err)
+		}
+		return util.Success(point)
 	}
 }
 
+// InviteHandler
+// @Tags 用户
+// @Summary 获取邀请码
+// @Accept json
+// @Produce json
+// @Failure 500 {string} string
+// @Success 200 {string} types.Invite
+// @Router /api/user/invite [get]
 func InviteHandler(service *UserService) util.HttpHandler {
 	return func(r *http.Request) util.HandleResult {
 		tgUser, _ := util.FromContext(r.Context())
@@ -69,6 +89,14 @@ func InviteHandler(service *UserService) util.HttpHandler {
 	}
 }
 
+// FriendHandler
+// @Tags 用户
+// @Summary 获取邀请的好友
+// @Accept json
+// @Produce json
+// @Failure 500 {string} string
+// @Success 200 {array} types.Friend
+// @Router /api/user/friends [get]
 func FriendHandler(service *UserService) util.HttpHandler {
 	return func(r *http.Request) util.HandleResult {
 		tgUser, _ := util.FromContext(r.Context())

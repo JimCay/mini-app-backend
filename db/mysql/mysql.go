@@ -10,7 +10,11 @@ import (
 	"tg-backend/pkg/log"
 )
 
-func InitMysql(config config.DbConfig) (*gorm.DB, error) {
+type MysqlStorage struct {
+	db *gorm.DB
+}
+
+func InitMysql(config config.DbConfig) (*MysqlStorage, error) {
 	gormConfig := &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
@@ -49,7 +53,7 @@ func InitMysql(config config.DbConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 	log.Info("db init complete")
-	return mysqlDb, nil
+	return &MysqlStorage{mysqlDb}, nil
 }
 
 func Migrator(db *gorm.DB) error {
@@ -57,7 +61,9 @@ func Migrator(db *gorm.DB) error {
 		AutoMigrate(
 			&model.User{},
 			&model.Friend{},
-			&model.Point{}); err != nil {
+			&model.Point{},
+			&model.Task{},
+			&model.UserTask{}); err != nil {
 		return err
 	}
 	return nil

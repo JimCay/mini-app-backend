@@ -8,9 +8,9 @@ import (
 type errorType string
 
 type HandleError struct {
-	Type     errorType `json:"type"`
-	ErrorKey string    `json:"error_key"`
-	Message  string    `json:"message"`
+	Type     errorType `json:"code"`
+	ErrorKey string    `json:"_"`
+	Message  string    `json:"msg"`
 	Err      error     `json:"-"`
 }
 
@@ -40,4 +40,5 @@ const (
 	ErrorBadAuth   errorType = "bad_auth"
 	ErrorForbidden errorType = "no_permission"
 	ErrorInternal  errorType = "internal"
+	ErrorPoint     errorType = "point_shrink"
 )

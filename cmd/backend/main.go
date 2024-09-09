@@ -76,17 +76,17 @@ func initNode(ctx *cli.Context) (*server.Server, error) {
 		return nil, err
 	}
 
-	err = log.Setup(cfg.LogConf)
+	logWriter, err := log.Setup(cfg.LogConf)
 	if err != nil {
 		return nil, err
 	}
 
-	var storage *db.Storage
+	var storage db.Storage
 	storage, err = db.Setup(cfg.DbConf)
 	if err != nil {
 		return nil, err
 	}
-	serv := server.NewServer(storage, cfg)
+	serv := server.NewServer(storage, cfg, logWriter)
 	if err != nil {
 		return nil, err
 	}

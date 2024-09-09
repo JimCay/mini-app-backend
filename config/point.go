@@ -1,7 +1,9 @@
 package config
 
 const (
-	INVITOR_POINT uint64 = 100
+	DEFAULT_DAY_LIMIT int32 = 3000
 
-	INVITEE_POINT uint64 = 100
+	INVITOR_POINT uint64 = 5000
+
+	INVITEE_POINT uint64 = 2000
 )
