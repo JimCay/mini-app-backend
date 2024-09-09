@@ -96,7 +96,7 @@ func GetRankHandler(pointService *PointService) util.HttpHandler {
 }
 
 // UpdatePointHandler
-// @Summary 获取积分排名
+// @Summary 更新积分
 // @Tags 积分
 // @Accept json
 // @Produce json

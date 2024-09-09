@@ -50,6 +50,7 @@ func (u *UserService) Friends(ctx context.Context, tgUser *types.TelegramUser) (
 // @Summary 登录
 // @Accept json
 // @Produce json
+// @Param  param body types.LoginInfo true "邀请码"
 // @Failure 500 {string} string
 // @Success 200 {object} types.Point
 // @Router /api/user/login [post]

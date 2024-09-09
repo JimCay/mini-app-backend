@@ -11,6 +11,11 @@ definitions:
       userName:
         type: string
     type: object
+  types.LoginInfo:
+    properties:
+      invite_code:
+        type: string
+    type: object
   types.Point:
     properties:
       energy:
@@ -132,7 +137,7 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: 获取积分排名
+      summary: 更新积分
       tags:
       - 积分
   /api/task/check:
@@ -222,6 +227,13 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: 邀请码
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/types.LoginInfo'
       produces:
       - application/json
       responses:

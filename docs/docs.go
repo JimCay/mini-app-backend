@@ -85,7 +85,7 @@ const docTemplate = `{
                 "tags": [
                     "积分"
                 ],
-                "summary": "获取积分排名",
+                "summary": "更新积分",
                 "parameters": [
                     {
                         "description": "积分信息",
@@ -254,6 +254,17 @@ const docTemplate = `{
                     "用户"
                 ],
                 "summary": "登录",
+                "parameters": [
+                    {
+                        "description": "邀请码",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.LoginInfo"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -285,6 +296,14 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "userName": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.LoginInfo": {
+            "type": "object",
+            "properties": {
+                "invite_code": {
                     "type": "string"
                 }
             }
