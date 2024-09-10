@@ -1,7 +1,7 @@
 package config
 
 const (
-	DefaultDayLimit int32 = 3000
+	DefaultDayLimit int32 = 5000
 
 	InvitorPoint uint64 = 5000
 
