@@ -32,9 +32,6 @@ func (p *PointService) GetPoint(ctx context.Context, tgUser *types.TelegramUser)
 }
 
 func (p *PointService) UpdatePoint(ctx context.Context, point *types.Point) error {
-	if point.Energy > point.Limit {
-		point.Energy = point.Limit
-	}
 	return p.storage.UpdatePoint(ctx, point.GetPoint())
 }
 
