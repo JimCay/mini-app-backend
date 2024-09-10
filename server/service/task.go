@@ -46,7 +46,8 @@ func (p *TaskService) TaskCheck(ctx context.Context, tgUser *types.TelegramUser,
 	if exist {
 		return false, nil
 	}
-	if task.TaskType == model.TASK_TYPE_FRIEND {
+	switch task.TaskType {
+	case model.TaskTypeFriend:
 		fs, err := p.storage.GetFriends(ctx, tgUser.ID)
 		if err != nil {
 			return false, err
@@ -58,7 +59,14 @@ func (p *TaskService) TaskCheck(ctx context.Context, tgUser *types.TelegramUser,
 			}
 			return true, nil
 		}
+	case model.TaskTypeX:
+		err := p.storage.TaskDone(ctx, task, tgUser.ID)
+		if err != nil {
+			return false, err
+		}
+		return true, nil
 	}
+
 	return false, nil
 }
 

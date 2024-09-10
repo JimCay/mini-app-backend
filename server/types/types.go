@@ -26,7 +26,7 @@ func GetPoint(point *model.Point) *Point {
 		Id:     point.Id,
 		Value:  point.Value,
 		Rate:   point.Rate,
-		Energy: point.Energy,
+		Energy: point.GetEnergy(),
 		Limit:  point.Limit,
 	}
 }
@@ -86,10 +86,11 @@ func GetRanks(ranks []model.Rank) []UserPoint {
 
 type Task struct {
 	Id          uint64 `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Reward      int32  `json:"reward"`
-	Status      bool   `json:"status"`
+	Name        string `json:"name"`        // 任务名称
+	Description string `json:"description"` // 任务细节
+	Type        int    `json:"type"`        // 任务类型 1: 邀请任务 2：X任务
+	Reward      int32  `json:"reward"`      // 奖励
+	Status      bool   `json:"status"`      // 任务完成状态 false 未完成 true 已完成
 }
 
 func GetTasks(task []model.Task, userTask []model.UserTask) []Task {
@@ -106,6 +107,7 @@ func GetTasks(task []model.Task, userTask []model.UserTask) []Task {
 			Name:        item.Name,
 			Description: item.Description,
 			Reward:      item.Reward,
+			Type:        item.TaskType,
 			Status:      userDone[item.Id],
 		})
 	}

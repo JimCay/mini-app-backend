@@ -50,23 +50,28 @@ func getDefalutHandler(appUrl string) bot.HandlerFunc {
 		kb := &models.InlineKeyboardMarkup{
 			InlineKeyboard: [][]models.InlineKeyboardButton{
 				{
-					{Text: "mini app",
+					{
+						Text:         "Get Opps",
 						CallbackData: "button_3",
-						URL:          appUrl},
+						URL:          appUrl,
+					},
 				},
 			},
 		}
 
+		text := "Welcome, @" + update.Message.Chat.Username + "!\n" +
+			"Ton Opps is the easiest way for you to access new opportunities in TON. \n" +
+			"It has established collaborations with dozens of DePIN&AI projects, " +
+			"and there will be more opportunities to participate in projects in the future.\n" +
+			"Invite friends and get even more coins together!\n" +
+			"Click GET to start!!! "
+
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      update.Message.Chat.ID,
-			Text:        "This is a test mini app",
+			Text:        text,
 			ReplyMarkup: kb,
 		})
 	}
-}
-
-func defaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-
 }
 
 func (t *TelegramBot) Start() {

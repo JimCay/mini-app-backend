@@ -53,7 +53,8 @@ func (s *MysqlStorage) TaskDone(ctx context.Context, task *model.Task, userId ui
 			return err
 		}
 		userPoint.Value += uint64(task.Reward)
-		return tx.Model(userPoint).Select("value", "updated_at").Updates(userPoint).Error
+		userPoint.Energy = userPoint.GetEnergy()
+		return tx.Model(userPoint).Select("value", "energy", "updated_at").Updates(userPoint).Error
 	})
 }
 

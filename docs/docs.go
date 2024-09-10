@@ -346,19 +346,27 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "description": {
+                    "description": "任务细节",
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "name": {
+                    "description": "任务名称",
                     "type": "string"
                 },
                 "reward": {
+                    "description": "奖励",
                     "type": "integer"
                 },
                 "status": {
+                    "description": "任务完成状态 false 未完成 true 已完成",
                     "type": "boolean"
+                },
+                "type": {
+                    "description": "任务类型 1: 邀请任务 2：X任务",
+                    "type": "integer"
                 }
             }
         },

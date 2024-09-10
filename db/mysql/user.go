@@ -26,16 +26,16 @@ func (s *MysqlStorage) InsertUser(ctx context.Context, user *model.User, inviteI
 		point := &model.Point{
 			Id:        user.Id,
 			Value:     0,
-			Limit:     config.DEFAULT_DAY_LIMIT,
-			Energy:    config.DEFAULT_DAY_LIMIT,
+			Limit:     config.DefaultDayLimit,
+			Energy:    config.DefaultDayLimit,
 			UpdatedAt: time.Now(),
 		}
 		if inviteId != 0 {
 			friend := &model.Friend{
 				Invitor:      inviteId,
 				Invitee:      user.Id,
-				Value:        int32(config.INVITOR_POINT),
-				InviteeValue: int32(config.INVITEE_POINT),
+				Value:        int32(config.InvitorPoint),
+				InviteeValue: int32(config.InviteePoint),
 				CreatedAt:    time.Now(),
 			}
 			err = tx.Create(friend).Error
@@ -47,19 +47,19 @@ func (s *MysqlStorage) InsertUser(ctx context.Context, user *model.User, inviteI
 			if err != nil {
 				if errors.Is(err, gorm.ErrRecordNotFound) {
 					invitorPoint.Id = inviteId
-					invitorPoint.Energy = config.DEFAULT_DAY_LIMIT
-					invitorPoint.Limit = config.DEFAULT_DAY_LIMIT
+					invitorPoint.Energy = config.DefaultDayLimit
+					invitorPoint.Limit = config.DefaultDayLimit
 					err = tx.Create(invitorPoint).Error
 				} else {
 					return err
 				}
 			}
-			invitorPoint.Value += config.INVITOR_POINT
+			invitorPoint.Value += config.InvitorPoint
 			err = tx.Model(invitorPoint).Update("value", invitorPoint.Value).Error
 			if err != nil {
 				return err
 			}
-			point.Value = config.INVITEE_POINT
+			point.Value = config.InviteePoint
 		}
 
 		err = tx.Clauses(clause.OnConflict{DoNothing: true}).Create(point).Error

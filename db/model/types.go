@@ -1,13 +1,18 @@
 package model
 
 import (
+	"tg-backend/config"
 	"time"
 )
 
-const TASK_TYPE_FRIEND int = 1
+const TaskTypeFriend int = 1
+
+const TaskTypeX int = 2
 
 const DELETE int8 = 0
 const NORMAL int8 = 1
+
+const EnergyOfTime = float32(3600*24) / float32(config.DefaultDayLimit)
 
 type User struct {
 	Id        uint64 `gorm:"primary_key" `
@@ -33,6 +38,19 @@ type Point struct {
 	Limit     int32
 	Energy    int32
 	UpdatedAt time.Time
+}
+
+func (p *Point) GetEnergy() int32 {
+	gap := time.Now().Unix() - p.UpdatedAt.Unix()
+	gapEnergy := int32(0)
+	if gap > 0 {
+		gapEnergy = int32(float32(gap) / EnergyOfTime)
+	}
+	energy := p.Energy + gapEnergy
+	if energy > p.Limit {
+		energy = p.Limit
+	}
+	return energy
 }
 
 type Task struct {
