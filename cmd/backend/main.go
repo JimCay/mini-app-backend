@@ -25,10 +25,10 @@ var cliFlag = []cli.Flag{
 
 func init() {
 	app.Action = run
-	app.Copyright = "Copyright 2024 Crust Authors"
-	app.Name = "Statistic"
-	app.Usage = "Statistic"
-	app.Authors = []*cli.Author{{Name: "Statistic 2024"}}
+	app.Copyright = "Copyright 2024 Ton Opps Authors"
+	app.Name = "Ton Opps"
+	app.Usage = "Ton Opps"
+	app.Authors = []*cli.Author{{Name: "Ton Opps 2024"}}
 	app.Version = Version
 	app.EnableBashCompletion = true
 	app.Flags = append(app.Flags, cliFlag...)
