@@ -6,7 +6,7 @@ import (
 )
 
 type LoginInfo struct {
-	InviteCode string `json:"invite_code"`
+	InviteCode string `json:"inviteCode"`
 }
 
 type Invite struct {

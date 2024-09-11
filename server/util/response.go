@@ -43,7 +43,7 @@ func responseError(handleError *HandleError, w http.ResponseWriter) {
 	w.WriteHeader(handleError.GetHttpStatus())
 	w.Header().Set("Content-Type", "application/json")
 	if _, err := w.Write(responseJson); err != nil {
-		log.Error("error writing response", err)
+		log.Error("error writing response %s", err)
 	}
 }
 
@@ -51,14 +51,14 @@ func responseOk(result HandleResult, w http.ResponseWriter) {
 	if result.Type == ResponseTypeJson {
 		responseJson, err := json.Marshal(result.Payload)
 		if err != nil {
-			log.Error("can't encode json", err)
+			log.Error("can't encode json %s", err)
 			http.Error(w, "can't encode json response error", http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if n, err := w.Write(responseJson); err != nil {
-			log.Error("error writing response", "err", err, "bytesWritten", n)
+			log.Error("error writing response %s bytesWritten %d", err, n)
 		}
 		return
 	}
@@ -66,7 +66,7 @@ func responseOk(result HandleResult, w http.ResponseWriter) {
 	if result.Type == ResponseTypeHtml {
 		tmpl := result.Payload.(*template.Template)
 		if err := tmpl.Execute(w, nil); err != nil {
-			log.Error("error executing template", err)
+			log.Error("error executing template %s", err)
 			http.Error(w, "error executing template", http.StatusInternalServerError)
 		}
 		return
@@ -82,7 +82,7 @@ func responseOk(result HandleResult, w http.ResponseWriter) {
 		w.Header().Set("Cache-Control", "public,max-age=86400;")
 		w.WriteHeader(http.StatusOK)
 		if _, err := io.Copy(w, reader); err != nil {
-			log.Error("error writing response", err)
+			log.Error("error writing response %s", err)
 		}
 		_ = reader.Close()
 		return
@@ -92,7 +92,7 @@ func responseOk(result HandleResult, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(responseJson); err != nil {
-		log.Error("error writing response", err)
+		log.Error("error writing response %s", err)
 	}
 }
 
