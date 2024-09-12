@@ -26,7 +26,7 @@ func (s *MysqlStorage) UpdatePoint(ctx context.Context, point *model.Point) erro
 func (s *MysqlStorage) Ranks(ctx context.Context) ([]model.Rank, error) {
 	var rating []model.Rank
 	err := s.db.Raw("SELECT u.id,u.user_name ,u.first_name,u.last_name,p.value " +
-		"FROM point p left join user u on u.id = p.id order by value desc limit 100 ").Scan(&rating).Error
+		"FROM point p left join user u on u.id = p.id order by value desc limit 20 ").Scan(&rating).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
