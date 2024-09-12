@@ -18,6 +18,8 @@ type UserStorage interface {
 
 	GetUser(ctx context.Context, id uint64) (*model.User, error)
 
+	UpdateUserDays(ctx context.Context, user *model.User) error
+
 	GetFriends(ctx context.Context, id uint64) ([]model.MyInvitee, error)
 }
 

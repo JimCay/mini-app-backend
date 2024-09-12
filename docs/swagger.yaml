@@ -13,7 +13,7 @@ definitions:
     type: object
   types.LoginInfo:
     properties:
-      invite_code:
+      inviteCode:
         type: string
     type: object
   types.Point:

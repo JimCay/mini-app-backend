@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"tg-backend/config"
 	"tg-backend/db"
 	"tg-backend/server/types"
 	"tg-backend/server/util"
@@ -115,6 +116,9 @@ func UpdatePointHandler(pointService *PointService) util.HttpHandler {
 		if p != nil {
 			if p.Value > request.Value {
 				return util.Error("point shrink", util.ErrorBadData)
+			}
+			if request.Value > (p.Value + uint64(config.DefaultDayLimit)) {
+				return util.Error("point error", util.ErrorBadData)
 			}
 		}
 		request.Id = tgUser.ID

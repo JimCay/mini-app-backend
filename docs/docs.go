@@ -303,7 +303,7 @@ const docTemplate = `{
         "types.LoginInfo": {
             "type": "object",
             "properties": {
-                "invite_code": {
+                "inviteCode": {
                     "type": "string"
                 }
             }

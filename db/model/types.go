@@ -19,7 +19,9 @@ type User struct {
 	FirstName string
 	LastName  string
 	UserName  string
+	UpdatedAt time.Time
 	CreatedAt time.Time
+	LoginDays int32
 }
 
 type Friend struct {

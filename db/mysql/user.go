@@ -84,6 +84,10 @@ func (s *MysqlStorage) GetUser(ctx context.Context, id uint64) (*model.User, err
 	return user, nil
 }
 
+func (s *MysqlStorage) UpdateUserDays(ctx context.Context, user *model.User) error {
+	return s.db.Model(user).Select("login_days", "updated_at").Updates(*user).Error
+}
+
 func (s *MysqlStorage) GetFriends(ctx context.Context, id uint64) ([]model.MyInvitee, error) {
 	var friends []model.MyInvitee
 	err := s.db.Raw("SELECT u.id,u.user_name ,u.first_name,u.last_name,f.value as reward "+

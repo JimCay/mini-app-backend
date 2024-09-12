@@ -29,6 +29,11 @@ func (u *UserService) Login(ctx context.Context, tgUser *types.TelegramUser, inf
 			inviteId = util.DecodeInvite(info.InviteCode)
 		}
 		return u.storage.InsertUser(ctx, user, inviteId)
+	} else {
+		if !util.IsToday(user.UpdatedAt) {
+			user.LoginDays++
+			return u.storage.UpdateUserDays(ctx, user)
+		}
 	}
 	return nil
 }

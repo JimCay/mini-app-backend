@@ -22,6 +22,8 @@ func (tu *TelegramUser) GetUser() *model.User {
 		LastName:  tu.LastName,
 		UserName:  tu.UserName,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		LoginDays: 1,
 	}
 }
 
