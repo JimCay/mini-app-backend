@@ -20,10 +20,14 @@ import (
 
 func NewTelegramAuthMiddleware(
 	telegramBotToken string,
+	expire int,
 ) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
+		if expire == 0 {
+			expire = 86400
+		}
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			tgUser, err := checkUser(r, telegramBotToken)
+			tgUser, err := checkUser(r, telegramBotToken, expire)
 			if err != nil {
 				errMsg := err.Error()
 				http.Error(w, errMsg, http.StatusForbidden)
@@ -36,7 +40,7 @@ func NewTelegramAuthMiddleware(
 	}
 }
 
-func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
+func checkUser(r *http.Request, token string, expireDuration int) (*types.TelegramUser, error) {
 	var query url.Values
 
 	// auth header
@@ -48,10 +52,10 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 		return nil, errors.New("authorization header parse error")
 	}
 
-	expire := checkExpire(query)
-	if expire {
-		return nil, errors.New("authorization expired")
-	}
+	//expire := checkExpire(query, expireDuration)
+	//if expire {
+	//	return nil, errors.New("authorization expired")
+	//}
 
 	res, err := checkAuth(token, query)
 	if err != nil || !res {
@@ -66,7 +70,7 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 	return tgUser, nil
 }
 
-func checkExpire(query url.Values) bool {
+func checkExpire(query url.Values, expire int) bool {
 	authDate := query.Get("auth_date")
 	if len(authDate) == 0 {
 		return false
@@ -76,7 +80,7 @@ func checkExpire(query url.Values) bool {
 		return false
 	}
 
-	return time.Now().Unix() > int64(authUnix+1800)
+	return time.Now().Unix() > int64(authUnix+expire)
 }
 
 func checkAuth(secret string, query url.Values) (bool, error) {

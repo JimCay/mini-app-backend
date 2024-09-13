@@ -97,3 +97,27 @@ func (s *MysqlStorage) GetFriends(ctx context.Context, id uint64) ([]model.MyInv
 	}
 	return friends, nil
 }
+
+func (s *MysqlStorage) AddDaily(ctx context.Context) error {
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		daily := &model.ActiveCount{}
+		err := tx.Where("daily = ?", time.Now().Format("2006-01-02")).Limit(1).Find(daily).Error
+		if err != nil {
+			return err
+		}
+		if daily.Id == 0 {
+			daily.Daily = time.Now()
+			daily.Count = 1
+			err = tx.Create(daily).Error
+			if err != nil {
+				return err
+			}
+		} else {
+			err = tx.Model(daily).UpdateColumn("count", gorm.Expr("count + ?", 1)).Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}

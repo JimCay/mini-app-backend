@@ -21,6 +21,8 @@ type UserStorage interface {
 	UpdateUserDays(ctx context.Context, user *model.User) error
 
 	GetFriends(ctx context.Context, id uint64) ([]model.MyInvitee, error)
+
+	AddDaily(ctx context.Context) error
 }
 
 type PointStorage interface {

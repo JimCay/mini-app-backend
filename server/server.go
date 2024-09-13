@@ -48,7 +48,7 @@ func NewHttpServer(sm *service.ServiceManager, config *config.Config, writer io.
 	}
 	r.HandleFunc("/health", util.ResponseWrapper(service.HealthCheck())).Methods("GET")
 	apiRouter := r.PathPrefix("/api").Subrouter()
-	authMiddleware := middleware.NewTelegramAuthMiddleware(config.TgConf.TelegramBotToken)
+	authMiddleware := middleware.NewTelegramAuthMiddleware(config.TgConf.TelegramBotToken, config.TgConf.Expire)
 	apiRouter.Use(authMiddleware)
 
 	handlerRouter(apiRouter, "/user/login", "POST", service.LoginHandler(sm.User, sm.Point))

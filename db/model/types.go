@@ -82,3 +82,9 @@ type Rank struct {
 	User
 	Value uint64
 }
+
+type ActiveCount struct {
+	Id    uint64    `gorm:"primary_key" `
+	Daily time.Time `gorm:"type:date;column:daily"`
+	Count int32
+}

@@ -63,7 +63,8 @@ func Migrator(db *gorm.DB) error {
 			&model.Friend{},
 			&model.Point{},
 			&model.Task{},
-			&model.UserTask{}); err != nil {
+			&model.UserTask{},
+			&model.ActiveCount{}); err != nil {
 		return err
 	}
 	return nil

@@ -20,6 +20,7 @@ type TgConfig struct {
 	Ssl                bool
 	Port               string
 	Swagger            bool
+	Expire             int
 }
 
 type LogConfig struct {

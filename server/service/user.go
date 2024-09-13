@@ -31,6 +31,7 @@ func (u *UserService) Login(ctx context.Context, tgUser *types.TelegramUser, inf
 		return u.storage.InsertUser(ctx, user, inviteId)
 	} else {
 		if !util.IsToday(user.UpdatedAt) {
+			err = u.storage.AddDaily(ctx)
 			user.LoginDays++
 			return u.storage.UpdateUserDays(ctx, user)
 		}
