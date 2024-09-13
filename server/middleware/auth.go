@@ -10,10 +10,12 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"tg-backend/pkg/log"
 	"tg-backend/server/types"
 	"tg-backend/server/util"
+	"time"
 )
 
 func NewTelegramAuthMiddleware(
@@ -55,6 +57,11 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 		return nil, err
 	}
 
+	expire := checkExpire(query)
+	if expire {
+		return nil, errors.New("authorization expired")
+	}
+
 	res, err := checkAuth(token, query)
 	if err != nil || !res {
 		return nil, err
@@ -66,6 +73,19 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 		return nil, err
 	}
 	return tgUser, nil
+}
+
+func checkExpire(query url.Values) bool {
+	authDate := query.Get("auth_date")
+	if len(authDate) == 0 {
+		return false
+	}
+	authUnix, err := strconv.Atoi(authDate)
+	if err != nil {
+		return false
+	}
+
+	return time.Now().Unix() > int64(authUnix+1800)
 }
 
 func checkAuth(secret string, query url.Values) (bool, error) {
