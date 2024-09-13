@@ -40,7 +40,7 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 	// auth header
 	authHeader := r.Header.Get("Authorization")
 	var err error
-	log.Info("Authorization: %s", authHeader)
+	//log.Info("Authorization: %s", authHeader)
 	// base64 decode
 	//authHeaderBytes, err := base64.StdEncoding.DecodeString(authHeader)
 	//authHeader = string(authHeaderBytes)
@@ -55,23 +55,10 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 		return nil, err
 	}
 
-	hash := query.Get("hash")
-	if len(hash) == 0 {
-		return nil, errors.New("hash empty")
-	}
-
-	authCheckString, err := getAuthCheckString(query)
-	if err != nil {
+	res, err := checkAuth(token, query)
+	if err != nil || !res {
 		return nil, err
 	}
-
-	secretKey := getHmac256Signature([]byte("WebAppData"), []byte(token))
-	expectedHash := getHmac256Signature(secretKey, []byte(authCheckString))
-	hex.EncodeToString(expectedHash)
-
-	//if expectedHashString != hash {
-	//	return nil, errors.New("hash incorrect")
-	//}
 
 	tgUser := &types.TelegramUser{}
 	err = json.Unmarshal([]byte(query.Get("user")), tgUser)
@@ -79,6 +66,27 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 		return nil, err
 	}
 	return tgUser, nil
+}
+
+func checkAuth(secret string, query url.Values) (bool, error) {
+	hash := query.Get("hash")
+	if len(hash) == 0 {
+		return false, errors.New("hash empty")
+	}
+
+	authCheckString, err := getAuthCheckString(query)
+	if err != nil {
+		return false, err
+	}
+
+	secretKey := getHmac256Signature([]byte("WebAppData"), []byte(secret))
+	expectedHash := getHmac256Signature(secretKey, []byte(authCheckString))
+	expectedHashString := hex.EncodeToString(expectedHash)
+
+	if expectedHashString != hash {
+		return false, errors.New("hash incorrect")
+	}
+	return true, nil
 }
 
 // get alphabetic sorted query string
