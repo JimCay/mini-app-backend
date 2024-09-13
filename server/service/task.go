@@ -52,7 +52,7 @@ func (p *TaskService) TaskCheck(ctx context.Context, tgUser *types.TelegramUser,
 		if err != nil {
 			return false, err
 		}
-		if len(fs) > task.Condition {
+		if len(fs) >= task.Condition {
 			err := p.storage.TaskDone(ctx, task, tgUser.ID)
 			if err != nil {
 				return false, err
