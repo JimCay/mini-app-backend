@@ -25,7 +25,7 @@ func NewTelegramAuthMiddleware(
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tgUser, err := checkUser(r, telegramBotToken)
 			if err != nil {
-				errMsg := "Authentication error!"
+				errMsg := err.Error()
 				http.Error(w, errMsg, http.StatusForbidden)
 				log.Error(err.Error())
 				return
@@ -42,19 +42,10 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 	// auth header
 	authHeader := r.Header.Get("Authorization")
 	var err error
-	//log.Info("Authorization: %s", authHeader)
-	// base64 decode
-	//authHeaderBytes, err := base64.StdEncoding.DecodeString(authHeader)
-	//authHeader = string(authHeaderBytes)
-	//if len(authHeader) == 0 || err != nil {
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//}
 
 	query, err = url.ParseQuery(authHeader)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("authorization header parse error")
 	}
 
 	expire := checkExpire(query)
@@ -70,7 +61,7 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 	tgUser := &types.TelegramUser{}
 	err = json.Unmarshal([]byte(query.Get("user")), tgUser)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("authorization invalid user")
 	}
 	return tgUser, nil
 }
@@ -91,7 +82,7 @@ func checkExpire(query url.Values) bool {
 func checkAuth(secret string, query url.Values) (bool, error) {
 	hash := query.Get("hash")
 	if len(hash) == 0 {
-		return false, errors.New("hash empty")
+		return false, errors.New("authorization hash empty")
 	}
 
 	authCheckString, err := getAuthCheckString(query)
@@ -104,7 +95,7 @@ func checkAuth(secret string, query url.Values) (bool, error) {
 	expectedHashString := hex.EncodeToString(expectedHash)
 
 	if expectedHashString != hash {
-		return false, errors.New("hash incorrect")
+		return false, errors.New("authorization hash incorrect")
 	}
 	return true, nil
 }
@@ -117,7 +108,7 @@ func getAuthCheckString(values url.Values) (string, error) {
 			continue
 		}
 		if len(v) != 1 {
-			return "", errors.New("is not a valid auth query")
+			return "", errors.New("authorization auth data error")
 		}
 		paramKeys = append(paramKeys, key)
 	}
