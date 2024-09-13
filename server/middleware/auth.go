@@ -40,6 +40,7 @@ func checkUser(r *http.Request, token string) (*types.TelegramUser, error) {
 	// auth header
 	authHeader := r.Header.Get("Authorization")
 	var err error
+	log.Info("Authorization: %s", authHeader)
 	// base64 decode
 	//authHeaderBytes, err := base64.StdEncoding.DecodeString(authHeader)
 	//authHeader = string(authHeaderBytes)
